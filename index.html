@@ -1,19 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stray Cats Locator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A community map prototype for missing, found, stray, and sighted cats.">
+  <title>Stray Cats Locator</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQjNpsJ2uXBo6gy9fG0Q3LSfHf6yqQ=" crossorigin="">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to Stray Cats Locator</h1>
-    <p>Here you can find and assist stray cats in your vicinity.</p>
-    <!-- More content as needed... -->
+  <header class="hero">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="#top" aria-label="Stray Cats Locator home">
+        <span class="brand-mark" aria-hidden="true">CAT</span>
+        <span>Stray Cats Locator</span>
+      </a>
+      <div class="nav-links">
+        <a href="#mapSection">Map</a>
+        <a href="#reportSection">Add report</a>
+        <a href="#safety">Safety</a>
+      </div>
+    </nav>
+
+    <section id="top" class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Community missing-cat and stray-cat map</p>
+        <h1>Help neighbors report, tag, and track cats on a shared map.</h1>
+        <p class="lede">Add a missing, found, stray, or sighted cat with tags and an approximate location. This MVP saves reports in your browser while the idea is still a safe static prototype.</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#reportSection">Add a cat report</a>
+          <a class="secondary-button" href="#mapSection">View map</a>
+        </div>
+      </div>
+      <aside class="hero-panel" aria-label="Prototype status">
+        <div class="stat-card">
+          <span id="totalReports">0</span>
+          <p>Total reports</p>
+        </div>
+        <div class="stat-card danger">
+          <span id="missingReports">0</span>
+          <p>Missing cats</p>
+        </div>
+        <div class="stat-card warning">
+          <span id="urgentReports">0</span>
+          <p>Urgent tags</p>
+        </div>
+      </aside>
+    </section>
+  </header>
+
+  <main>
+    <section class="notice" id="safety">
+      <div>
+        <strong>Safety-first prototype:</strong>
+        Use approximate locations for private homes. Do not trespass, chase cats into traffic, publish private addresses, or trap/transport animals without local rescue guidance.
+      </div>
+    </section>
+
+    <section class="workspace" aria-label="Cat locator workspace">
+      <div class="map-column" id="mapSection">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Live community board</p>
+            <h2>Map of cat reports</h2>
+          </div>
+          <span class="visible-count" id="visibleReports">0 visible</span>
+        </div>
+
+        <div class="filters" aria-label="Filter reports">
+          <label>
+            Search
+            <input id="searchInput" type="search" placeholder="tabby, collar, Doylestown...">
+          </label>
+          <label>
+            Status
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="missing">Missing</option>
+              <option value="found">Found / safe</option>
+              <option value="stray">Stray</option>
+              <option value="sighted">Sighted</option>
+            </select>
+          </label>
+          <label>
+            Tag
+            <select id="tagFilter">
+              <option value="all">All tags</option>
+              <option value="urgent">Urgent</option>
+              <option value="injured">Injured</option>
+              <option value="friendly">Friendly</option>
+              <option value="feral">Feral</option>
+              <option value="kitten">Kitten</option>
+              <option value="has-collar">Has collar</option>
+              <option value="needs-food">Needs food</option>
+              <option value="microchip-unknown">Microchip unknown</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="map" role="application" aria-label="Interactive map of cat reports"></div>
+        <p class="map-hint">Tip: click the map to copy latitude/longitude into the report form.</p>
+
+        <div class="report-list" id="reportList" aria-live="polite"></div>
+      </div>
+
+      <aside class="form-column" id="reportSection">
+        <div class="form-card">
+          <p class="eyebrow">Add a local report</p>
+          <h2>Report a cat</h2>
+          <p class="form-intro">For now, reports are stored locally in this browser. That keeps the MVP simple and GitHub Pages-friendly.</p>
+
+          <form id="reportForm">
+            <label>
+              Cat name or label
+              <input name="name" type="text" placeholder="Miso, unknown gray kitten...">
+            </label>
+
+            <label>
+              Status
+              <select name="status" required>
+                <option value="missing">Missing</option>
+                <option value="found">Found / safe</option>
+                <option value="stray">Stray</option>
+                <option value="sighted">Sighted</option>
+              </select>
+            </label>
+
+            <label>
+              Description
+              <textarea name="description" rows="4" required placeholder="Color, pattern, collar, temperament, condition, direction of travel..."></textarea>
+            </label>
+
+            <fieldset>
+              <legend>Tags</legend>
+              <div class="checkbox-grid">
+                <label><input type="checkbox" name="tags" value="urgent"> Urgent</label>
+                <label><input type="checkbox" name="tags" value="injured"> Injured</label>
+                <label><input type="checkbox" name="tags" value="friendly"> Friendly</label>
+                <label><input type="checkbox" name="tags" value="feral"> Feral</label>
+                <label><input type="checkbox" name="tags" value="kitten"> Kitten</label>
+                <label><input type="checkbox" name="tags" value="has-collar"> Has collar</label>
+                <label><input type="checkbox" name="tags" value="needs-food"> Needs food</label>
+                <label><input type="checkbox" name="tags" value="microchip-unknown"> Microchip unknown</label>
+              </div>
+            </fieldset>
+
+            <label>
+              Last seen date
+              <input name="lastSeen" type="date">
+            </label>
+
+            <label>
+              Approximate area
+              <input name="locationName" type="text" required placeholder="Warrington Township, near Main St, etc.">
+            </label>
+
+            <div class="coordinate-grid">
+              <label>
+                Latitude
+                <input id="lat" name="lat" type="number" step="0.00001" required placeholder="40.25010">
+              </label>
+              <label>
+                Longitude
+                <input id="lng" name="lng" type="number" step="0.00001" required placeholder="-75.13490">
+              </label>
+            </div>
+
+            <label>
+              Public contact note
+              <input name="contact" type="text" placeholder="Call flyer number, contact rescue, DM admin later...">
+            </label>
+
+            <label class="inline-check">
+              <input id="approximate" name="approximate" type="checkbox" checked>
+              Location is approximate / privacy-safe
+            </label>
+
+            <button class="primary-button full" type="submit">Save report locally</button>
+            <button class="secondary-button full" id="resetDemo" type="button">Restore demo reports</button>
+            <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer>
+    <p>Prototype goal: turn a placeholder stray cat page into a useful missing-cat map MVP. Future upgrades: backend, image uploads, moderation, alert radius, and printable flyers.</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="app.js"></script>
 </body>
 </html>
