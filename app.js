@@ -68,15 +68,11 @@
   let reports = [];
 
   function uniqueTags(tags) {
-    const seen = new Set();
-    return (Array.isArray(tags) ? tags : [])
-      .map((tag) => String(tag).trim().toLowerCase())
-      .filter(Boolean)
-      .filter((tag) => {
-        if (seen.has(tag)) return false;
-        seen.add(tag);
-        return true;
-      });
+    return [...new Set(
+      (Array.isArray(tags) ? tags : [])
+        .map((tag) => String(tag).trim().toLowerCase())
+        .filter(Boolean)
+    )];
   }
 
   function parseCoordinate(value, name) {
@@ -95,12 +91,12 @@
 
   function createReport(input) {
     const status = String(input.status || '').trim().toLowerCase();
-    if (!Object.prototype.hasOwnProperty.call(STATUS_LABELS, status)) {
+    if (!STATUS_LABELS[status]) {
       throw new Error('Choose a valid report status.');
     }
 
-    const lat = parseCoordinate(input.lat ?? input.latitude ?? input.coordinates?.lat, 'Latitude');
-    const lng = parseCoordinate(input.lng ?? input.longitude ?? input.coordinates?.lng, 'Longitude');
+    const lat = parseCoordinate(input.lat, 'Latitude');
+    const lng = parseCoordinate(input.lng, 'Longitude');
     validateCoordinates(lat, lng);
 
     const description = String(input.description || '').trim();
@@ -189,10 +185,6 @@
     };
   }
 
-  function statusClass(status) {
-    return `status-${status}`;
-  }
-
   function renderStats(visibleReports) {
     const total = document.querySelector('#totalReports');
     const missing = document.querySelector('#missingReports');
@@ -244,9 +236,9 @@
   function reportCard(report) {
     const tagHtml = report.tags.map((tag) => `<span class="tag">${escapeHtml(TAG_LABELS[tag] || tag)}</span>`).join('');
     return `
-      <article class="report-card" data-id="${escapeHtml(report.id)}">
-        <div class="report-card__topline">
-          <span class="status-pill ${statusClass(report.status)}">${escapeHtml(getStatusLabel(report.status))}</span>
+      <article class="report-card">
+        <div class="report-card-topline">
+          <span class="status-pill status-${report.status}">${escapeHtml(getStatusLabel(report.status))}</span>
           <span class="date">${escapeHtml(formatDate(report.lastSeen))}</span>
         </div>
         <h3>${escapeHtml(report.name)}</h3>
@@ -331,7 +323,7 @@
 
   function initMap() {
     if (typeof root.L === 'undefined') return;
-    map = root.L.map('map', { scrollWheelZoom: true }).setView(DEFAULT_CENTER, 11);
+    map = root.L.map('map').setView(DEFAULT_CENTER, 11);
     root.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors',
@@ -358,14 +350,10 @@
   }
 
   const api = {
-    STORAGE_KEY,
-    STATUS_LABELS,
-    TAG_LABELS,
     SAMPLE_REPORTS,
     createReport,
     filterReports,
     getStatusLabel,
-    initApp,
   };
 
   if (typeof module !== 'undefined' && module.exports) {
