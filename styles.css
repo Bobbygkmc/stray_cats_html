@@ -1,7 +1,6 @@
 :root {
   color-scheme: light;
   --bg: #f7efe5;
-  --paper: #fffaf3;
   --ink: #27211d;
   --muted: #74695f;
   --line: #ead9c5;
@@ -25,7 +24,7 @@ html {
 
 body {
   margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--ink);
   background:
     radial-gradient(circle at top left, rgba(217, 107, 43, 0.18), transparent 34rem),
@@ -139,7 +138,7 @@ h2 {
 }
 
 .hero-actions,
-.report-card__topline,
+.report-card-topline,
 .section-heading,
 .filters,
 .tag-row {
@@ -183,7 +182,6 @@ h2 {
 
 .full {
   width: 100%;
-  justify-content: center;
 }
 
 .hero-panel {
@@ -339,19 +337,23 @@ textarea:focus {
   transform: rotate(45deg);
 }
 
-.cat-marker--missing {
+.cat-marker--missing,
+.status-missing {
   background: var(--red);
 }
 
-.cat-marker--found {
+.cat-marker--found,
+.status-found {
   background: var(--green);
 }
 
-.cat-marker--stray {
+.cat-marker--stray,
+.status-stray {
   background: var(--yellow);
 }
 
-.cat-marker--sighted {
+.cat-marker--sighted,
+.status-sighted {
   background: var(--blue);
 }
 
@@ -386,7 +388,7 @@ footer p {
   line-height: 1.55;
 }
 
-.report-card__topline {
+.report-card-topline {
   justify-content: space-between;
 }
 
@@ -398,22 +400,6 @@ footer p {
 
 .status-pill {
   color: white;
-}
-
-.status-missing {
-  background: var(--red);
-}
-
-.status-found {
-  background: var(--green);
-}
-
-.status-stray {
-  background: var(--yellow);
-}
-
-.status-sighted {
-  background: var(--blue);
 }
 
 .tag {
