@@ -31,8 +31,14 @@ test('createReport normalizes a missing-cat report with tags and coordinates', (
 
 test('createReport rejects coordinates outside map bounds', () => {
   assert.throws(
-    () => createReport({ name: 'Bad pin', status: 'stray', lat: '999', lng: '-75' }),
-    /valid latitude and longitude/
+    () => createReport({
+      name: 'Bad pin',
+      status: 'stray',
+      description: 'Gray cat near the porch',
+      lat: '999',
+      lng: '-75',
+    }),
+    /within map bounds/
   );
 });
 
